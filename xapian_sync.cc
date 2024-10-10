@@ -497,10 +497,12 @@ xapian_scan_filenames (sqlite3 *db, const string &maildir,
       continue;
     }
     cleanup _close (close, dfd);
-    {
+    if (dfd != -1) {
       struct stat sb;
-      if (fstat(dfd, &sb) < 0)
+      if (fstat(dfd, &sb) < 0) {
+	cerr << dirpath << ": fstat: " << strerror(errno) << '\n';
 	continue;
+      }
       if ((sb.st_mode & S_IFMT) != S_IFDIR) {
 	cerr << dirpath << ": " << "expected a directory\n";
 	continue;
