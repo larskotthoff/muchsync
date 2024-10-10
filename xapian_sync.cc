@@ -497,6 +497,15 @@ xapian_scan_filenames (sqlite3 *db, const string &maildir,
       continue;
     }
     cleanup _close (close, dfd);
+    {
+      struct stat sb;
+      if (fstat(dfd, &sb) < 0)
+	continue;
+      if ((sb.st_mode & S_IFMT) != S_IFDIR) {
+	cerr << dirpath << ": " << "expected a directory\n";
+	continue;
+      }
+    }
 
     i64 dir_docid = dirscan.integer(1);
     f.scan_dir_.reset().param(dir_docid).step();
