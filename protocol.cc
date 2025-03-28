@@ -116,11 +116,15 @@ static string
 new_maildir_path(const string &dir, string *namep = nullptr)
 {
   string name = maildir_name();
-  if ((dir.size() > 4 && !strncmp(dir.data() + (dir.size() - 4), "/cur", 4))
-      || (dir.size() == 3 && dir == "cur"))
-    name += ":2,";
-  if (namep)
+  if(!namep) {
+      if ((dir.size() > 4 && !strncmp(dir.data() + (dir.size() - 4), "/cur", 4))
+          || (dir.size() == 3 && dir == "cur"))
+        name += ":2,";
     *namep = name;
+  } else {
+    size_t pos = namep->rfind('/');
+    name = namep->substr(pos + 1);
+  }
   if (dir.size() && dir.back() != '/')
     return dir + "/" + name;
   else
@@ -374,10 +378,10 @@ msg_sync::hash_sync(const versvector &rvv,
     for (; li.second > 0; --li.second) {
       if (!sanity_check_path(li.first))
 	break;
-      string newname;
       string target =
-	new_maildir_path(hashdb.maildir + "/" + li.first, &newname);
+	new_maildir_path(hashdb.maildir + "/" + li.first, &source);
       if (link(source.c_str(), target.c_str())
+	  && errno != EEXIST
 	  && (errno != ENOENT
 	      || !maildir_mkdir(hashdb.maildir + "/" + li.first)
 	      || link(source.c_str(), target.c_str())))
@@ -395,7 +399,7 @@ msg_sync::hash_sync(const versvector &rvv,
 					      tip ? &tip->tags : nullptr,
 					      &isnew));
       i64 dir_id = get_dir_docid(li.first);
-      add_file_.reset().param(dir_id, newname, docid, ts_to_double(sb.ST_MTIM),
+      add_file_.reset().param(dir_id, source, docid, ts_to_double(sb.ST_MTIM),
 			      i64(sb.st_ino), hashdb.hash_id()).step();
       if (isnew) {
 	record_docid_.reset().param(rhi.message_id, docid).step();
@@ -523,7 +527,12 @@ msg_sync::tag_sync(const versvector &rvv, const tag_info &rti)
 static string
 receive_message (istream &in, const hash_info &hi, const string &maildir)
 {
-  string path (maildir + muchsync_tmpdir + "/" + maildir_name());
+  string fname;
+  if (!getline (in, fname))
+    throw runtime_error ("premature EOF");
+  if (fname.back() == '\n')
+    fname.pop_back();
+  string path = (maildir + muchsync_tmpdir + "/" + fname);
   ofstream tmp (path, ios_base::out|ios_base::trunc);
   if (!tmp.is_open())
     throw runtime_error (path + ": " + strerror(errno));
@@ -660,10 +669,15 @@ send_content(hash_lookup &hashdb, tag_lookup &tagdb, const string &hash,
 	     const string &prefix, ostream &out)
 {
   streambuf *sb;
+  string path;
+  bool trash = false;
   if (hashdb.lookup(hash) && (sb = hashdb.content())
+      && hashdb.get_pathname (&path, &trash)
       && tagdb.lookup(hashdb.info().message_id)) {
+    size_t pos = path.rfind('/');
     out << prefix << hashdb.info()
-	<< ' ' << tagdb.info() << '\n' << sb;
+	<< ' ' << tagdb.info() << '\n' << path.substr(pos + 1)
+    << '\n' << sb;
     return true;
   }
   return false;
@@ -850,7 +864,7 @@ muchsync_server(sqlite3 *db, notmuch_db &nm)
 200-lsync
 200-quit
 200-send HASH
-200-recv HASH-INFO LINK-INFO <newline> CONTENTS
+200-recv HASH-INFO LINK-INFO <newline> FILENAME <newline> CONTENTS
 200-tags TAG-INFO
 200-tinfo MESSAGE-ID
 200-tsync
