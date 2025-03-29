@@ -13,11 +13,12 @@ jobs:
     
     steps:
     - uses: actions/checkout@v3
-    - run: cd ~
     - run: sudo apt-get install -y notmuch libnotmuch-dev wget build-essential ssh curl autoconf automake pkg-config libtool libsqlite3-dev libxapian-dev sqlite3
     - run: echo -e "[database]\npath=$HOME/notmuch-list\n\n[user]\nname=test\nprimary_email=test@test.com\n\n[new]\ntags=unread;\nignore=\n\n[search]\nexclude_tags=deleted;\nauthors_separator=;\nauthors_matched_separator=;\n\n[maildir]\nsynchronize_flags=true\n\n[crypto]\ngpg_path=gpg" > ~/.notmuch-config
     - run: wget https://nmbug.notmuchmail.org/archive/notmuch-list.tar.xz
+      working-directory: ~
     - run: tar xf notmuch-list.tar.xz
+      working-directory: ~
     - run: notmuch new
     - run: notmuch tag -unread date:..1M
     - run: notmuch tag +patch subject:patch or attachment:.patch
@@ -25,17 +26,23 @@ jobs:
     - run: notmuch tag +question body:question or subject:'?'
     - run: notmuch tag +todo date:1M.. and tag:patch
 
-    - run: cd muchsync
     - run: ./autogen.sh
+      working-directory: .
     - run: ./configure
+      working-directory: .
     - run: make
-    - run: cd ..
+      working-directory: .
     - run: mkdir muchsync-test
+      working-directory: ~
     - run: ssh-keygen -P "" -f .ssh/test
+      working-directory: ~
     - run: cp .ssh/test.pub .ssh/authorized_keys
+      working-directory: ~
     - run: sudo service ssh start
 
     - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config ./muchsync/muchsync -r ~/muchsync/muchsync --init ~/muchsync-test localhost
+      working-directory: ~
     - run: notmuch count '*' > /tmp/server.count
     - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config notmuch count '*' > /tmp/client.count
+      working-directory: ~
     - run: if [ `cat /tmp/server.count` -neq `cat /tmp/client.count` ]; then exit 1; fi
