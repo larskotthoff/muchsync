@@ -32,7 +32,7 @@ jobs:
     - run: mkdir muchsync-test
     - run: ssh-keygen -P "" -f .ssh/test
     - run: cp .ssh/test.pub .ssh/authorized_keys
-    - run: service ssh start
+    - run: sudo service ssh start
 
     - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config ./muchsync/muchsync -r ~/muchsync/muchsync --init ~/muchsync-test localhost
     - run: notmuch count '*' > /tmp/server.count
