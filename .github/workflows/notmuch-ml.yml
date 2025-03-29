@@ -13,8 +13,6 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
-      with:
-        path: ~/muchsync
     - run: sudo apt-get install -y notmuch libnotmuch-dev wget build-essential ssh curl autoconf automake pkg-config libtool libsqlite3-dev libxapian-dev sqlite3
     - run: echo -e "[database]\npath=$HOME/notmuch-list\n\n[user]\nname=test\nprimary_email=test@test.com\n\n[new]\ntags=unread;\nignore=\n\n[search]\nexclude_tags=deleted;\nauthors_separator=;\nauthors_matched_separator=;\n\n[maildir]\nsynchronize_flags=true\n\n[crypto]\ngpg_path=gpg" > ~/.notmuch-config
     - run: wget https://nmbug.notmuchmail.org/archive/notmuch-list.tar.xz
@@ -29,7 +27,7 @@ jobs:
     - run: notmuch tag +todo date:1M.. and tag:patch
 
     - run: ./autogen.sh && ./configure && make
-      working-directory: ~/muchsync
+      working-directory: $GITHUB_WORKSPACE/muchsync
 
     - run: mkdir ~/muchsync-test
     - run: mkdir ~/.ssh
@@ -37,7 +35,7 @@ jobs:
     - run: cp ~/.ssh/test.pub ~/.ssh/authorized_keys
     - run: sudo service ssh start
 
-    - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config ~/muchsync/muchsync -r ~/muchsync/muchsync --init ~/muchsync-test localhost
+    - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config $GITHUB_WORKSPACE/muchsync/muchsync -r $GITHUB_WORKSPACE/muchsync/muchsync --init ~/muchsync-test localhost
     - run: notmuch count '*' > /tmp/server.count
     - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config notmuch count '*' > /tmp/client.count
     - run: if [ `cat /tmp/server.count` -neq `cat /tmp/client.count` ]; then exit 1; fi
