@@ -31,6 +31,7 @@ jobs:
 
     - run: mkdir ~/muchsync-test
     - run: mkdir ~/.ssh
+    - run: chmod 700 ~/.ssh
     - run: ssh-keygen -P "" -f ~/.ssh/test
     - run: cp ~/.ssh/test.pub ~/.ssh/authorized_keys
     - run: sudo service ssh start
