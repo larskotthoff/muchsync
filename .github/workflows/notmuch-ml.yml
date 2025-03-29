@@ -27,7 +27,7 @@ jobs:
     - run: notmuch tag +todo date:1M.. and tag:patch
 
     - run: ./autogen.sh && ./configure && make
-      working-directory: $GITHUB_WORKSPACE/muchsync
+      working-directory: .
 
     - run: mkdir ~/muchsync-test
     - run: mkdir ~/.ssh
