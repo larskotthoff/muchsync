@@ -32,17 +32,13 @@ jobs:
       working-directory: .
     - run: make
       working-directory: .
-    - run: mkdir muchsync-test
-      working-directory: ~
-    - run: ssh-keygen -P "" -f .ssh/test
-      working-directory: ~
-    - run: cp .ssh/test.pub .ssh/authorized_keys
-      working-directory: ~
+    - run: mkdir ~/muchsync-test
+    - run: mkdir ~/.ssh
+    - run: ssh-keygen -P "" -f ~/.ssh/test
+    - run: cp ~/.ssh/test.pub ~/.ssh/authorized_keys
     - run: sudo service ssh start
 
-    - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config ./muchsync/muchsync -r ~/muchsync/muchsync --init ~/muchsync-test localhost
-      working-directory: ~
+    - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config ~/muchsync/muchsync -r ~/muchsync/muchsync --init ~/muchsync-test localhost
     - run: notmuch count '*' > /tmp/server.count
     - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config notmuch count '*' > /tmp/client.count
-      working-directory: ~
     - run: if [ `cat /tmp/server.count` -neq `cat /tmp/client.count` ]; then exit 1; fi
