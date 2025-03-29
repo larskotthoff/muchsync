@@ -529,7 +529,7 @@ receive_message (istream &in, const hash_info &hi, const string &maildir)
 {
   string fname;
   if (!getline (in, fname))
-    throw runtime_error ("premature EOF");
+    throw runtime_error ("premature EOF getting filename");
   if (fname.back() == '\n')
     fname.pop_back();
   string path = (maildir + muchsync_tmpdir + "/" + fname);
