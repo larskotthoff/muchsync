@@ -12,7 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        path: ~/muchsync
     - run: sudo apt-get install -y notmuch libnotmuch-dev wget build-essential ssh curl autoconf automake pkg-config libtool libsqlite3-dev libxapian-dev sqlite3
     - run: echo -e "[database]\npath=$HOME/notmuch-list\n\n[user]\nname=test\nprimary_email=test@test.com\n\n[new]\ntags=unread;\nignore=\n\n[search]\nexclude_tags=deleted;\nauthors_separator=;\nauthors_matched_separator=;\n\n[maildir]\nsynchronize_flags=true\n\n[crypto]\ngpg_path=gpg" > ~/.notmuch-config
     - run: wget https://nmbug.notmuchmail.org/archive/notmuch-list.tar.xz
@@ -26,12 +28,9 @@ jobs:
     - run: notmuch tag +question body:question or subject:'?'
     - run: notmuch tag +todo date:1M.. and tag:patch
 
-    - run: ./autogen.sh
-      working-directory: .
-    - run: ./configure
-      working-directory: .
-    - run: make
-      working-directory: .
+    - run: ./autogen.sh && ./configure && make
+      working-directory: ~/muchsync
+
     - run: mkdir ~/muchsync-test
     - run: mkdir ~/.ssh
     - run: ssh-keygen -P "" -f ~/.ssh/test
