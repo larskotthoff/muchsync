@@ -32,11 +32,12 @@ jobs:
     - run: mkdir ~/muchsync-test
     - run: mkdir ~/.ssh
     - run: chmod 700 ~/.ssh
-    - run: ssh-keygen -P "" -f ~/.ssh/test
+    - run: ssh-keygen -N "" -f ~/.ssh/test
     - run: cp ~/.ssh/test.pub ~/.ssh/authorized_keys
+    - run: chmod 600 ~/.ssh/authorized_keys
     - run: sudo service ssh start
 
-    - run: $GITHUB_WORKSPACE/muchsync -C ~/muchsync-test/.notmuch-config -vvv -r $GITHUB_WORKSPACE/muchsync --init ~/muchsync-test localhost
+    - run: $GITHUB_WORKSPACE/muchsync -C ~/muchsync-test/.notmuch-config -s "ssh -CTaxq -o StrictHostKeyChecking=no" -vvv -r $GITHUB_WORKSPACE/muchsync --init ~/muchsync-test localhost
     - run: notmuch count '*' > /tmp/server.count
     - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config notmuch count '*' > /tmp/client.count
     - run: if [ `cat /tmp/server.count` -neq `cat /tmp/client.count` ]; then exit 1; fi
