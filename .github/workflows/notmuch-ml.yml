@@ -37,4 +37,4 @@ jobs:
     - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config ./muchsync/muchsync -r ~/muchsync/muchsync --init ~/muchsync-test localhost
     - run: notmuch count '*' > /tmp/server.count
     - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config notmuch count '*' > /tmp/client.count
-    - run: [ `cat /tmp/server.count` -eq `cat /tmp/client.count` ]
+    - run: if [ `cat /tmp/server.count` -neq `cat /tmp/client.count` ]; then exit 1; fi
