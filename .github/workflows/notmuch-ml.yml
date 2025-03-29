@@ -1,0 +1,40 @@
+name: Muchsync with notmuch mailing list archive
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  notmuch-ml:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    - run: sudo apt-get install -y notmuch libnotmuch-dev wget build-essential ssh curl autoconf automake pkg-config libtool libsqlite3-dev libxapian-dev sqlite3
+    - run: echo "[database]\npath=/root/notmuch-list\n\n[user]\nname=test\nprimary_email=test@test.com\n\n[new]\ntags=unread;\nignore=\n\n[search]\nexclude_tags=deleted;\nauthors_separator=;\nauthors_matched_separator=;\n\n[maildir]\nsynchronize_flags=true\n\n[crypto]\ngpg_path=gpg" > .notmuch-config
+    - run: wget https://nmbug.notmuchmail.org/archive/notmuch-list.tar.xz
+    - run: tar xf notmuch-list.tar.xz
+    - run: notmuch new
+    - run: notmuch tag -unread date:..1M
+    - run: notmuch tag +patch subject:patch or attachment:.patch
+    - run: notmuch tag +bug subject:bug or body:bug
+    - run: notmuch tag +question body:question or subject:'?'
+    - run: notmuch tag +todo date:1M.. and tag:patch
+
+    - run: cd muchsync
+    - run: ./autogen.sh
+    - run: ./configure
+    - run: make
+    - run: cd ..
+    - run: mkdir muchsync-test
+    - run: ssh-keygen -P "" -f .ssh/test
+    - run: cp .ssh/test.pub .ssh/authorized_keys
+    - run: service ssh start
+
+    - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config ./muchsync/muchsync -r ~/muchsync/muchsync --init ~/muchsync-test localhost
+    - run: notmuch count '*' > /tmp/server.count
+    - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config notmuch count '*' > /tmp/client.count
+    - run: [ `cat /tmp/server.count` -eq `cat /tmp/client.count` ]
