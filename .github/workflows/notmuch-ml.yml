@@ -35,7 +35,7 @@ jobs:
     - run: cp ~/.ssh/test.pub ~/.ssh/authorized_keys
     - run: sudo service ssh start
 
-    - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config $GITHUB_WORKSPACE/muchsync/muchsync -r $GITHUB_WORKSPACE/muchsync/muchsync --init ~/muchsync-test localhost
+    - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config $GITHUB_WORKSPACE/muchsync -r $GITHUB_WORKSPACE/muchsync --init ~/muchsync-test localhost
     - run: notmuch count '*' > /tmp/server.count
     - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config notmuch count '*' > /tmp/client.count
     - run: if [ `cat /tmp/server.count` -neq `cat /tmp/client.count` ]; then exit 1; fi
