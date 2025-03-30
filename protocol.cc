@@ -380,7 +380,7 @@ msg_sync::hash_sync(const versvector &rvv,
 	break;
       string target =
 	new_maildir_path(hashdb.maildir + "/" + li.first, &source);
-      if (link(source.c_str(), target.c_str()) {
+      if (link(source.c_str(), target.c_str())) {
         if(errno != EEXIST) {
           if(errno != ENOENT
               || !maildir_mkdir(hashdb.maildir + "/" + li.first)
