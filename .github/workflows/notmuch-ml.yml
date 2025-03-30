@@ -41,3 +41,10 @@ jobs:
     - run: notmuch count '*' > /tmp/server.count
     - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config notmuch count '*' > /tmp/client.count
     - run: if [ `cat /tmp/server.count` -neq `cat /tmp/client.count` ]; then exit 1; fi
+
+    - run: if [ `notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "question" ]; then exit 1; fi
+    - run: notmuch tag +foo id:87r05rqsbz.fsf@tethera.net
+    - run: if [ `notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "fooquestion" ]; then exit 1; fi
+    - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config if [ `notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "question" ]; then exit 1; fi
+    - run: $GITHUB_WORKSPACE/muchsync -C ~/muchsync-test/.notmuch-config -s "ssh -i ~/.ssh/test -CTaxq -o StrictHostKeyChecking=no" -r $GITHUB_WORKSPACE/muchsync localhost
+    - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config if [ `notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "fooquestion" ]; then exit 1; fi
