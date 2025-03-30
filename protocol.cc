@@ -388,6 +388,8 @@ msg_sync::hash_sync(const versvector &rvv,
 	  throw runtime_error (string("link (\"") + source + "\", \""
 			       + target + "\"): " + strerror(errno));
 
+      if(errno == EEXIST) cerr << strerror(errno) << " " << source << '\n';
+
       cleanup end_atomic;
       if (tip) {
 	nm_.begin_atomic();
