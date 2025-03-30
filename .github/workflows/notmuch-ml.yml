@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - run: sudo apt-get install -y notmuch libnotmuch-dev wget build-essential ssh curl autoconf automake pkg-config libtool libsqlite3-dev libxapian-dev sqlite3
-    - run: echo -e "[database]\npath=$HOME/notmuch-list\n\n[user]\nname=test\nprimary_email=test@test.com\n\n[new]\ntags=unread;\nignore=\n\n[search]\nexclude_tags=deleted;\nauthors_separator=;\nauthors_matched_separator=;\n\n[maildir]\nsynchronize_flags=true\n\n[crypto]\ngpg_path=gpg" > ~/.notmuch-config
+    - run: echo -e "[database]\npath=~/notmuch-list\n\n[user]\nname=test\nprimary_email=test@test.com\n\n[new]\ntags=unread;\nignore=\n\n[search]\nexclude_tags=deleted;\nauthors_separator=;\nauthors_matched_separator=;\n\n[maildir]\nsynchronize_flags=true\n\n[crypto]\ngpg_path=gpg" > ~/.notmuch-config
     - run: wget https://nmbug.notmuchmail.org/archive/notmuch-list.tar.xz
       working-directory: ~
     - run: tar xf notmuch-list.tar.xz
@@ -39,12 +39,18 @@ jobs:
 
     - run: $GITHUB_WORKSPACE/muchsync -C ~/muchsync-test/.notmuch-config -s "ssh -i ~/.ssh/test -CTaxq -o StrictHostKeyChecking=no" -vvv -r $GITHUB_WORKSPACE/muchsync --init ~/muchsync-test localhost
     - run: notmuch count '*' > /tmp/server.count
-    - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config notmuch count '*' > /tmp/client.count
+    - run: notmuch count '*' > /tmp/client.count
+      env:
+        NOTMUCH_CONFIG: ~/muchsync-test/.notmuch-config
     - run: if [ `cat /tmp/server.count` -neq `cat /tmp/client.count` ]; then exit 1; fi
 
     - run: if [ `notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "question" ]; then exit 1; fi
     - run: notmuch tag +foo id:87r05rqsbz.fsf@tethera.net
     - run: if [ `notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "fooquestion" ]; then exit 1; fi
-    - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config if [ `notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "question" ]; then exit 1; fi
+    - run: if [ `notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "question" ]; then exit 1; fi
+      env:
+        NOTMUCH_CONFIG: ~/muchsync-test/.notmuch-config
     - run: $GITHUB_WORKSPACE/muchsync -C ~/muchsync-test/.notmuch-config -s "ssh -i ~/.ssh/test -CTaxq -o StrictHostKeyChecking=no" -r $GITHUB_WORKSPACE/muchsync localhost
-    - run: NOTMUCH_CONFIG=~/muchsync-test/.notmuch-config if [ `notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "fooquestion" ]; then exit 1; fi
+    - run: if [ `notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "fooquestion" ]; then exit 1; fi
+      env:
+        NOTMUCH_CONFIG: ~/muchsync-test/.notmuch-config
