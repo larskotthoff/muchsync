@@ -380,15 +380,17 @@ msg_sync::hash_sync(const versvector &rvv,
 	break;
       string target =
 	new_maildir_path(hashdb.maildir + "/" + li.first, &source);
-      if (link(source.c_str(), target.c_str())
-	  && errno != EEXIST
-	  && (errno != ENOENT
-	      || !maildir_mkdir(hashdb.maildir + "/" + li.first)
-	      || link(source.c_str(), target.c_str())))
-	  throw runtime_error (string("link (\"") + source + "\", \""
-			       + target + "\"): " + strerror(errno));
-
-      if(errno == EEXIST) cerr << strerror(errno) << " " << source << '\n';
+      if (link(source.c_str(), target.c_str()) {
+        if(errno != EEXIST) {
+          if(errno != ENOENT
+              || !maildir_mkdir(hashdb.maildir + "/" + li.first)
+              || link(source.c_str(), target.c_str()))
+          throw runtime_error (string("link (\"") + source + "\", \""
+                       + target + "\"): " + strerror(errno));
+        } else if(errno == EEXIST) {
+          cerr << strerror(errno) << " " << source << '\n';
+        }
+      }
 
       cleanup end_atomic;
       if (tip) {
