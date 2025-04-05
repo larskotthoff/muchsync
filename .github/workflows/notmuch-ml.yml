@@ -69,3 +69,19 @@ jobs:
     - run: if [ `notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "fooquestion" ]; then exit 1; fi
       env:
         NOTMUCH_CONFIG: /tmp/muchsync-test/.notmuch-config
+
+    - run: sqlite3 /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM configuration"
+    - run: sqlite3 /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM configuration"
+    - run: sqlite3 /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM sync_vector"
+    - run: sqlite3 /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM sync_vector"
+    - run: sqlite3 /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM xapian_dirs"
+    - run: sqlite3 /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM xapian_dirs"
+    - run: sqlite3 /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM message_ids"
+    - run: sqlite3 /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM message_ids"
+    - run: sqlite3 /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM xapian_files"
+    - run: sqlite3 /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM xapian_files"
+    - run: sqlite3 /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM maildir_hashes"
+    - run: sqlite3 /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM maildir_hashes"
+    - run: sqlite3 /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM xapian_nlinks"
+    - run: sqlite3 /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM xapian_nlinks"
+

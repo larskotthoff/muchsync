@@ -47,7 +47,8 @@ CREATE TABLE xapian_files (
   docid INTEGER,
   mtime REAL,
   inode INTEGER,
-  hash_id INTEGER);
+  hash_id INTEGER,
+  PRIMARY KEY (dir_docid, name));
 CREATE INDEX xapian_files_hash_id ON xapian_files (hash_id, dir_docid);
 CREATE TABLE maildir_hashes (
   hash_id INTEGER PRIMARY KEY,
