@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@v4
     - run: sudo apt-get install -y notmuch libnotmuch-dev wget build-essential ssh curl autoconf automake pkg-config libtool libsqlite3-dev libxapian-dev sqlite3
     - run: echo -e "[database]\npath=/tmp/notmuch-list\n\n[user]\nname=test\nprimary_email=test@test.com\n\n[new]\ntags=unread;\nignore=\n\n[search]\nexclude_tags=deleted;\nauthors_separator=;\nauthors_matched_separator=;\n\n[maildir]\nsynchronize_flags=true\n\n[crypto]\ngpg_path=gpg" > ~/.notmuch-config
-    - run: wget https://nmbug.notmuchmail.org/archive/notmuch-list.tar.xz && tar xf notmuch-list.tar.xz 2018-02
+    - run: wget https://nmbug.notmuchmail.org/archive/notmuch-list.tar.xz && tar xf notmuch-list.tar.xz notmuch-list/2018-02
       working-directory: /tmp
     - run: notmuch new
     - run: notmuch tag -unread date:..1M
