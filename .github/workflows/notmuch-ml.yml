@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@v4
     - run: sudo apt-get install -y notmuch libnotmuch-dev wget build-essential ssh curl autoconf automake pkg-config libtool libsqlite3-dev libxapian-dev sqlite3
     - run: echo -e "[database]\npath=/tmp/notmuch-list\n\n[user]\nname=test\nprimary_email=test@test.com\n\n[new]\ntags=unread;\nignore=\n\n[search]\nexclude_tags=deleted;\nauthors_separator=;\nauthors_matched_separator=;\n\n[maildir]\nsynchronize_flags=true\n\n[crypto]\ngpg_path=gpg" > ~/.notmuch-config
-    - run: wget https://nmbug.notmuchmail.org/archive/notmuch-list.tar.xz && tar xf notmuch-list.tar.xz
+    - run: wget https://nmbug.notmuchmail.org/archive/notmuch-list.tar.xz && tar xf notmuch-list.tar.xz 2018-02
       working-directory: /tmp
     - run: notmuch new
     - run: notmuch tag -unread date:..1M
@@ -42,6 +42,21 @@ jobs:
         NOTMUCH_CONFIG: /tmp/muchsync-test/.notmuch-config
     - run: if [ `cat /tmp/server.count` -neq `cat /tmp/client.count` ]; then exit 1; fi
     - run: diff -rq /tmp/notmuch-list /tmp/muchsync-test || exit 0
+    
+    - run: sqlite /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM configuration"
+    - run: sqlite /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM configuration"
+    - run: sqlite /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM sync_vector"
+    - run: sqlite /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM sync_vector"
+    - run: sqlite /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM xapian_dirs"
+    - run: sqlite /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM xapian_dirs"
+    - run: sqlite /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM message_ids"
+    - run: sqlite /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM message_ids"
+    - run: sqlite /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM xapian_files"
+    - run: sqlite /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM xapian_files"
+    - run: sqlite /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM maildir_hashes"
+    - run: sqlite /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM maildir_hashes"
+    - run: sqlite /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM xapian_nlinks"
+    - run: sqlite /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM xapian_nlinks"
 
     - run: if [ `notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "question" ]; then exit 1; fi
     - run: notmuch tag +foo id:87r05rqsbz.fsf@tethera.net
