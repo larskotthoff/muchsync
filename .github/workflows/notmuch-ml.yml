@@ -43,20 +43,20 @@ jobs:
     - run: if [ `cat /tmp/server.count` -neq `cat /tmp/client.count` ]; then exit 1; fi
     - run: diff -rq /tmp/notmuch-list /tmp/muchsync-test || exit 0
     
-    - run: sqlite /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM configuration"
-    - run: sqlite /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM configuration"
-    - run: sqlite /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM sync_vector"
-    - run: sqlite /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM sync_vector"
-    - run: sqlite /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM xapian_dirs"
-    - run: sqlite /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM xapian_dirs"
-    - run: sqlite /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM message_ids"
-    - run: sqlite /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM message_ids"
-    - run: sqlite /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM xapian_files"
-    - run: sqlite /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM xapian_files"
-    - run: sqlite /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM maildir_hashes"
-    - run: sqlite /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM maildir_hashes"
-    - run: sqlite /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM xapian_nlinks"
-    - run: sqlite /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM xapian_nlinks"
+    - run: sqlite3 /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM configuration"
+    - run: sqlite3 /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM configuration"
+    - run: sqlite3 /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM sync_vector"
+    - run: sqlite3 /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM sync_vector"
+    - run: sqlite3 /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM xapian_dirs"
+    - run: sqlite3 /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM xapian_dirs"
+    - run: sqlite3 /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM message_ids"
+    - run: sqlite3 /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM message_ids"
+    - run: sqlite3 /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM xapian_files"
+    - run: sqlite3 /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM xapian_files"
+    - run: sqlite3 /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM maildir_hashes"
+    - run: sqlite3 /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM maildir_hashes"
+    - run: sqlite3 /tmp/notmuch-list/.notmuch/muchsync/state.db "SELECT * FROM xapian_nlinks"
+    - run: sqlite3 /tmp/muchsync-test/.notmuch/muchsync/state.db "SELECT * FROM xapian_nlinks"
 
     - run: if [ `notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "question" ]; then exit 1; fi
     - run: notmuch tag +foo id:87r05rqsbz.fsf@tethera.net
