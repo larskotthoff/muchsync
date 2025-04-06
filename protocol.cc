@@ -341,6 +341,10 @@ msg_sync::hash_sync(const versvector &rvv,
         (links_conflict ? resolve_link_conflicts (lhi.dirs, rhi.dirs) : rhi.dirs);
     bool needsource = false;
     for (auto i : lhi.dirs)
+        cerr << "lhi.dirs " << i.first << " " << i.second << endl;
+    for (auto i : rhi.dirs)
+        cerr << "rhi.dirs " << i.first << " " << i.second << endl;
+    for (auto i : lhi.dirs)
         needlinks[i.first] -= i.second;
     for (auto i : needlinks)
         if (i.second > 0) {
