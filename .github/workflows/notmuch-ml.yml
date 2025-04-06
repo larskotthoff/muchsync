@@ -43,6 +43,7 @@ jobs:
     - run: if [ `cat /tmp/server.count` -neq `cat /tmp/client.count` ]; then exit 1; fi
     - run: diff -rq /tmp/notmuch-list /tmp/muchsync-test || exit 0
     
+    - run: notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net
     - run: if [ X`notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "Xquestion" ]; then exit 1; fi
     - run: notmuch tag +foo id:87r05rqsbz.fsf@tethera.net
     - run: if [ X`notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "Xfooquestion" ]; then exit 1; fi
