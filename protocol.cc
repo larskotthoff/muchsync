@@ -388,7 +388,7 @@ msg_sync::hash_sync(const versvector &rvv,
                         throw runtime_error (string("link (\"") + source + "\", \""
                                 + target + "\"): " + strerror(errno));
                 } else if(errno == EEXIST) {
-                    cerr << strerror(errno) << " " << source << '\n';
+                    cerr << strerror(errno) << " source " << source << " target " << target << endl;
                     return true;
                 }
             }
