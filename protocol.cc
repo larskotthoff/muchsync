@@ -375,7 +375,7 @@ msg_sync::hash_sync(const versvector &rvv,
 
     /* add missing links */
     for (auto li : needlinks) {
-        cerr << "need link " << li << endl;
+        cerr << "need link " << li.first << " " << li.second << endl;
     }
     for (auto li : needlinks)
         for (; li.second > 0; --li.second) {
