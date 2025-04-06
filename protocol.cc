@@ -423,6 +423,7 @@ msg_sync::hash_sync(const versvector &rvv,
                 add_tag_.reset().param(docid, "").step();
             }
         }
+        li.second = 0;
     }
     /* remove extra links */
     if (!links_conflict) {
