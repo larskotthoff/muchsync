@@ -385,15 +385,15 @@ hash_lookup::get_pathname(string *out, bool *from_trash) const
   struct stat sb;
   string path;
   for (int i = 0, e = nlinks(); i < e; i++) {
-    path = link_path(i);
-    if (!stat(path.c_str(), &sb) && S_ISREG(sb.st_mode)
-	&& sb.st_size == hi_.size) {
-      if (out)
-	*out = move(path);
-      if (from_trash)
-	*from_trash = false;
-      return true;
-    }
+      path = link_path(i);
+      if (!stat(path.c_str(), &sb) && S_ISREG(sb.st_mode)
+              && sb.st_size == hi_.size) {
+          if (out)
+              *out = move(path);
+          if (from_trash)
+              *from_trash = false;
+          return true;
+      }
   }
 
   path = trashname(maildir, hi_.hash);
