@@ -390,7 +390,6 @@ msg_sync::hash_sync(const versvector &rvv,
                                 + target + "\"): " + strerror(errno));
                 } else if(errno == EEXIST) {
                     cerr << strerror(errno) << " source " << source << " target " << target << endl;
-                    return true;
                 }
             }
 
