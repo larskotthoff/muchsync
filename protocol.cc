@@ -463,18 +463,6 @@ msg_sync::hash_sync(const versvector &rvv,
         }
     }
 
-    /* Adjust link counts in database */
-    for (auto li : save_needlinks)
-        if (li.second != 0) {
-            i64 dir_docid = get_dir_docid(li.first);
-            i64 newcount = find_default(0, lhi.dirs, li.first) + li.second;
-            if (newcount > 0)
-                set_link_count_.reset()
-                    .param(hashdb.hash_id(), dir_docid, newcount).step();
-            else
-                delete_link_count_.reset().param(hashdb.hash_id(), dir_docid).step();
-        }
-
     if (clean_trash)
         unlink (trashname(hashdb.maildir, rhi.hash).c_str());
     return true;
