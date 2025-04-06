@@ -541,6 +541,7 @@ receive_message (istream &in, const hash_info &hi, const string &maildir)
         fname.pop_back();
     string path = (maildir + muchsync_tmpdir + "/" + fname);
     ofstream tmp (path, ios_base::out|ios_base::trunc);
+    cerr << "receive message " << fname << endl;
     if (!tmp.is_open())
         throw runtime_error (path + ": " + strerror(errno));
     cleanup _unlink (unlink, path.c_str());
