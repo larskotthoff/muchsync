@@ -43,15 +43,14 @@ jobs:
     - run: if [ `cat /tmp/server.count` -neq `cat /tmp/client.count` ]; then exit 1; fi
     - run: diff -rq /tmp/notmuch-list /tmp/muchsync-test || exit 0
     
-    - run: notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net
-    - run: if [ X`notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "Xquestion" ]; then exit 1; fi
-    - run: notmuch tag +foo id:87r05rqsbz.fsf@tethera.net
-    - run: if [ X`notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "Xfooquestion" ]; then exit 1; fi
-    - run: if [ X`notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "Xquestion" ]; then exit 1; fi
+    - run: if [ X`notmuch search --output=tags id:1517843248.cvlu0mp4mk.astroid@strange.none | tr -d '\n'` != "Xquestion" ]; then exit 1; fi
+    - run: notmuch tag +foo id:1517843248.cvlu0mp4mk.astroid@strange.none
+    - run: if [ X`notmuch search --output=tags id:1517843248.cvlu0mp4mk.astroid@strange.none | tr -d '\n'` != "Xfooquestion" ]; then exit 1; fi
+    - run: if [ X`notmuch search --output=tags id:1517843248.cvlu0mp4mk.astroid@strange.none | tr -d '\n'` != "Xquestion" ]; then exit 1; fi
       env:
         NOTMUCH_CONFIG: /tmp/muchsync-test/.notmuch-config
     - run: $GITHUB_WORKSPACE/muchsync -C /tmp/muchsync-test/.notmuch-config -s "ssh -i ~/.ssh/test -CTaxq -o StrictHostKeyChecking=no" -vvvvv -r $GITHUB_WORKSPACE/muchsync localhost
     - run: diff -rq /tmp/notmuch-list /tmp/muchsync-test || exit 0
-    - run: if [ X`notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "Xfooquestion" ]; then exit 1; fi
+    - run: if [ X`notmuch search --output=tags id:1517843248.cvlu0mp4mk.astroid@strange.none | tr -d '\n'` != "Xfooquestion" ]; then exit 1; fi
       env:
         NOTMUCH_CONFIG: /tmp/muchsync-test/.notmuch-config
