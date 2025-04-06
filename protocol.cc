@@ -374,56 +374,57 @@ msg_sync::hash_sync(const versvector &rvv,
     auto save_needlinks = needlinks;
 
     /* add missing links */
-    for (auto li : needlinks) {
-        if (!sanity_check_path(li.first))
-            break;
-        string target =
-            new_maildir_path(hashdb.maildir + "/" + li.first, &source);
-        cerr << "link source " << source << " target " << target << endl;
-        if (link(source.c_str(), target.c_str())) {
-            if(errno != EEXIST) {
-                if(errno != ENOENT
-                        || !maildir_mkdir(hashdb.maildir + "/" + li.first)
-                        || link(source.c_str(), target.c_str()))
-                    throw runtime_error (string("link (\"") + source + "\", \""
-                            + target + "\"): " + strerror(errno));
-            } else if(errno == EEXIST) {
-                throw runtime_error (string("link (\"") + source + "\", \""
-                        + target + "\"): " + strerror(errno));
+    for (auto li : needlinks)
+        for (; li.second > 0; --li.second) {
+            if (!sanity_check_path(li.first))
+                break;
+            string target =
+                new_maildir_path(hashdb.maildir + "/" + li.first, &source);
+            cerr << "link source " << source << " target " << target << endl;
+            if (link(source.c_str(), target.c_str())) {
+                if(errno != EEXIST) {
+                    if(errno != ENOENT
+                            || !maildir_mkdir(hashdb.maildir + "/" + li.first)
+                            || link(source.c_str(), target.c_str()))
+                        throw runtime_error (string("link (\"") + source + "\", \""
+                                + target + "\"): " + strerror(errno));
+                } else if(errno == EEXIST) {
+                    cerr << strerror(errno) << " source " << source << " target " << target << endl;
+                    break;
+                }
             }
-        }
 
-        cleanup end_atomic;
-        if (tip) {
-            nm_.begin_atomic();
-            end_atomic.reset(mem_fn(&notmuch_db::end_atomic), ref(nm_));
-        }
-        bool isnew;
-        docid =
-            notmuch_db::get_docid(nm_.add_message(target,
-                        tip ? &tip->tags : nullptr,
-                        &isnew));
-        i64 dir_id = get_dir_docid(li.first);
-        add_file_.reset().param(dir_id, source, docid, ts_to_double(sb.ST_MTIM),
-                i64(sb.st_ino), hashdb.hash_id()).step();
-        if (isnew) {
-            record_docid_.reset().param(rhi.message_id, docid).step();
-            // tip might be NULL here when undeleting a file
+            cleanup end_atomic;
             if (tip) {
-                update_message_id_stamp_.reset()
-                    .param(tip->tag_stamp.first, tip->tag_stamp.second, docid).step();
-                add_tag_.reset().bind_int(1, docid);
-                for (auto t : tip->tags)
-                    add_tag_.reset().bind_text(2, t).step();
+                nm_.begin_atomic();
+                end_atomic.reset(mem_fn(&notmuch_db::end_atomic), ref(nm_));
             }
-            else {
-                // The empty tag is always invalid, so if worse comes to
-                // worst and we crash at the wrong time, the next scan will
-                // end up bumping the version number on this message ID.
-                add_tag_.reset().param(docid, "").step();
+            bool isnew;
+            docid =
+                notmuch_db::get_docid(nm_.add_message(target,
+                            tip ? &tip->tags : nullptr,
+                            &isnew));
+            i64 dir_id = get_dir_docid(li.first);
+            add_file_.reset().param(dir_id, source, docid, ts_to_double(sb.ST_MTIM),
+                    i64(sb.st_ino), hashdb.hash_id()).step();
+            if (isnew) {
+                record_docid_.reset().param(rhi.message_id, docid).step();
+                // tip might be NULL here when undeleting a file
+                if (tip) {
+                    update_message_id_stamp_.reset()
+                        .param(tip->tag_stamp.first, tip->tag_stamp.second, docid).step();
+                    add_tag_.reset().bind_int(1, docid);
+                    for (auto t : tip->tags)
+                        add_tag_.reset().bind_text(2, t).step();
+                }
+                else {
+                    // The empty tag is always invalid, so if worse comes to
+                    // worst and we crash at the wrong time, the next scan will
+                    // end up bumping the version number on this message ID.
+                    add_tag_.reset().param(docid, "").step();
+                }
             }
         }
-    }
     /* remove extra links */
     if (!links_conflict) {
         for (int i = 0, e = hashdb.nlinks(); i < e; i++) {
