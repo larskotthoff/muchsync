@@ -374,6 +374,9 @@ msg_sync::hash_sync(const versvector &rvv,
     auto save_needlinks = needlinks;
 
     /* add missing links */
+    for (auto li : needlinks) {
+        cerr << "need link " << li << endl;
+    }
     for (auto li : needlinks)
         for (; li.second > 0; --li.second) {
             if (!sanity_check_path(li.first))
@@ -389,7 +392,8 @@ msg_sync::hash_sync(const versvector &rvv,
                         throw runtime_error (string("link (\"") + source + "\", \""
                                 + target + "\"): " + strerror(errno));
                 } else if(errno == EEXIST) {
-                    cerr << strerror(errno) << " source " << source << " target " << target << endl;
+                    throw runtime_error (string("link (\"") + source + "\", \""
+                            + target + "\"): " + strerror(errno));
                 }
             }
 
