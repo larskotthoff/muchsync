@@ -457,9 +457,9 @@ msg_sync::hash_sync(const versvector &rvv,
                     del_file_.reset().param(dir_docid, df.second).step();
                     nm_.remove_message(path);
                 }
+                cerr << "unlink " << path << " conflict " << links_conflict << "\n";
             }
         }
-        cerr << "unlink " << path << " conflict " << links_conflict << "\n";
     }
 
     /* Adjust link counts in database */
