@@ -35,7 +35,7 @@ jobs:
     - run: chmod 600 ~/.ssh/authorized_keys
     - run: sudo service ssh start
 
-    - run: $GITHUB_WORKSPACE/muchsync -C /tmp/muchsync-test/.notmuch-config -s "ssh -i ~/.ssh/test -CTaxq -o StrictHostKeyChecking=no" -vvv -r $GITHUB_WORKSPACE/muchsync --init /tmp/muchsync-test localhost
+    - run: $GITHUB_WORKSPACE/muchsync -C /tmp/muchsync-test/.notmuch-config -s "ssh -i ~/.ssh/test -CTaxq -o StrictHostKeyChecking=no" -vvvvv -r $GITHUB_WORKSPACE/muchsync --init /tmp/muchsync-test localhost
     - run: notmuch count '*' > /tmp/server.count
     - run: notmuch count '*' > /tmp/client.count
       env:
@@ -49,11 +49,8 @@ jobs:
     - run: if [ `notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "question" ]; then exit 1; fi
       env:
         NOTMUCH_CONFIG: /tmp/muchsync-test/.notmuch-config
-    - run: $GITHUB_WORKSPACE/muchsync -C /tmp/muchsync-test/.notmuch-config -s "ssh -i ~/.ssh/test -CTaxq -o StrictHostKeyChecking=no" -vvv -r $GITHUB_WORKSPACE/muchsync localhost
+    - run: $GITHUB_WORKSPACE/muchsync -C /tmp/muchsync-test/.notmuch-config -s "ssh -i ~/.ssh/test -CTaxq -o StrictHostKeyChecking=no" -vvvvv -r $GITHUB_WORKSPACE/muchsync localhost
     - run: diff -rq /tmp/notmuch-list /tmp/muchsync-test || exit 0
     - run: if [ `notmuch search --output=tags id:87r05rqsbz.fsf@tethera.net | tr -d '\n'` != "fooquestion" ]; then exit 1; fi
       env:
         NOTMUCH_CONFIG: /tmp/muchsync-test/.notmuch-config
-
-    - run: $GITHUB_WORKSPACE/muchsync -C /tmp/muchsync-test/.notmuch-config -s "ssh -i ~/.ssh/test -CTaxq -o StrictHostKeyChecking=no" -vvv -r $GITHUB_WORKSPACE/muchsync localhost
-    - run: diff -rq /tmp/notmuch-list /tmp/muchsync-test || exit 0
